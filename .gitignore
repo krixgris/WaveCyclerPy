@@ -1,0 +1,17 @@
+/**/.DS_Store
+/POC/**
+/.vscode
+/*.wav
+/*.ws6
+/**/*.wav
+/**/*.WAV
+/**/*.ws6
+__pycache__/*
+__pycache__/*.pyc
+test_*.py
+config.toml
+main.spec
+/build/**
+/dist/**
+build.command
+.sourcery.yaml
