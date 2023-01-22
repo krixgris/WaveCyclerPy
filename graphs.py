@@ -14,7 +14,9 @@ class TKFrame(Protocol):
 
 
 class BaseGraph:
-	"""Base class for graphs"""
+	"""Base class for graphs
+	Creates a figure and axes for the graph, as well as a canvas.
+	grid and draw are exposed from canvas and tk_widget so they can be used"""
 	def __init__(self, frame=TKFrame, nrows=1, ncols=1, figsize=(10,5), **kwargs):
 		self.fig, self._ax = plt.subplots(nrows=nrows,ncols=ncols, figsize=figsize)
 		self.ax = np.ravel(self._ax)

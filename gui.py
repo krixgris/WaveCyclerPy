@@ -9,6 +9,7 @@ from typing import Protocol
 from graphs import BaseGraph
 
 class Config(Protocol):
+	"""Protocol for config file"""
 	config_file:str
 	config:str
 
@@ -20,15 +21,6 @@ class Config(Protocol):
 	BACKUP_DIR:str
 	SPLIT_WAVE_DIR:str
 	DEBUG:True
-	"""Protocol for config files"""
-	def __init__(self, *args, **kwargs):
-		pass
-
-	def __post_init__(self):
-		pass
-
-	def _generate_default_file(self):
-		pass
 
 class ListBoxData:
 	def __init__(self, name, items, listbox_frame, layout_manager, **kwargs):
