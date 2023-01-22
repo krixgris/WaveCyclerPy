@@ -1,6 +1,7 @@
 # gui.py
 from glob import glob
 import numpy as np
+from random import randint
 
 import customtkinter as ctk
 import tkinter as tk
@@ -26,6 +27,7 @@ class ListBoxData:
 	def __init__(self, name, items, listbox_frame, layout_manager, **kwargs):
 		self.name = name
 		self.items_list = items
+		self.graph_object:BaseGraph = None
 		self.items:ctk.StringVar = ctk.StringVar(name=self.name, value=items)
 		self.items.trace_add('write', self.items_changed_callback)
 		self.selected_index = ctk.IntVar()
@@ -35,15 +37,19 @@ class ListBoxData:
 
 	def on_select(self, event):
 		# Update the selected index variable when an item is selected
-		self.update_items(["stuff", "things", "other stuff"])
+		# self.update_items(["stuff", "things", "other stuff"])
 		self.selected_index.set(event.widget.curselection()[0])
+		self.graph_object.update_ax(self.selected_index.get(), np.random.rand(10+randint(0, 10)))
+		
+	def set_graph_object(self, graph_object:BaseGraph):
+		self.graph_object = graph_object
 	
 	def update_items(self, items:list):
 		self.items.set(value=items)
 
 	def get_selected_index(self):
 		return self.selected_index.get()
-
+	
 	def items_changed_callback(self, *args):
 		print("variable changed via something..")
 		print(args)
@@ -97,11 +103,15 @@ class MainApplication(ctk.CTkFrame):
 
 		self.big_graph = BaseGraph(frame=self.big_graph_frame, nrows=2, ncols=1, figsize=(10,5))
 		self.big_graph.grid()
-		self.big_graph._test_sine()
+		# self.big_graph._test_sine()
 
 		self.small_graphs = BaseGraph(frame=self.small_graph_frame, nrows=2, ncols=16, figsize=(10,5))
 		self.small_graphs.grid()
-		self.small_graphs._test()
+		# self.small_graphs._test()
+
+		self.listbox1.set_graph_object(self.big_graph)
+		self.listbox2.set_graph_object(self.small_graphs)
+		self.listbox3.set_graph_object(self.small_graphs)
 
 	# create function to update the listbox items
 	def update_listbox(self, listbox, items:list):
