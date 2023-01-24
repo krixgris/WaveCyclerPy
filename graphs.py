@@ -25,7 +25,7 @@ class BaseGraph:
 
 		self.rows = nrows
 		self.cols = ncols
-		self.ax_count = len(self.ax)
+		# self.ax_count = len(self.ax)
 
 		self._canvas_setup(frame=frame)
 
@@ -38,7 +38,6 @@ class BaseGraph:
 
 		self.grid =	self.canvas.get_tk_widget().grid
 		self.draw = self.canvas.draw
-
 
 	# fill all ax objects with sines
 	def _test_sine(self):
@@ -53,6 +52,11 @@ class BaseGraph:
 			ax.plot(np.random.rand(10))
 			self.format_ax(ax)
 
+	@property
+	def length(self):
+		"""Returns the number of axes"""
+		return len(self.ax)
+
 	def format_ax(self, ax, *args, **kwargs):
 		"""Format the axes"""
 		ax.axis("off")
@@ -63,7 +67,7 @@ class BaseGraph:
 	def update_ax(self, ax_num, value:np.ndarray):
 		"""Update the axes"""
 		print(ax_num)
-		if(ax_num >= self.ax_count):
+		if(ax_num >= self.length):
 			raise IndexError(f"Unable to update graph, index out of range ({ax_num=})")
 		# clear the axes
 		self.ax[ax_num].clear()
