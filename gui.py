@@ -1,13 +1,17 @@
 # gui.py
 from glob import glob
+from dataclasses import dataclass, field
 import numpy as np
 from random import randint
+from os import path
 
 import customtkinter as ctk
 import tkinter as tk
 
 from typing import Protocol
 from graphs import BaseGraph
+
+from file_handler import File, friendly_file_list
 
 class Config(Protocol):
 	"""Protocol for config file"""
@@ -24,21 +28,26 @@ class Config(Protocol):
 	DEBUG:True
 
 class ListBoxData:
-	def __init__(self, name, items, listbox_frame, layout_manager, **kwargs):
+	"""Has BaseGraph and a tk.Listbox.
+	.grid() is exposed from listbox for gui management."""
+	def __init__(self, name, file_path, items, listbox_frame, **kwargs):
 		self.name = name
+		self.file_list = [File(i,f) for i,f in enumerate(glob(f"{file_path}/*.*")) if path.splitext(f)[1] in [".wav",".ws6"]]
+		print(self.file_list)
 		self.items_list = items
 		self.graph_object:BaseGraph = None
-		self.items:ctk.StringVar = ctk.StringVar(name=self.name, value=items)
+		self.items:ctk.StringVar = ctk.StringVar(name=self.name, value=friendly_file_list(self.file_list))
 		self.items.trace_add('write', self.items_changed_callback)
 		self.selected_index = ctk.IntVar()
 		self.listbox = tk.Listbox(listbox_frame, listvariable=self.items, exportselection=False)
-		layout_manager(self.listbox, **kwargs)
 		self.listbox.bind("<<ListboxSelect>>", self.on_select)
+		self.grid = self.listbox.grid
 
 	def on_select(self, event):
 		# Update the selected index variable when an item is selected
 		# self.update_items(["stuff", "things", "other stuff"])
 		self.selected_index.set(event.widget.curselection()[0])
+		print(self.file_list[self.selected_index.get()].filename)
 		self.graph_object.update_ax(self.selected_index.get(), np.random.rand(10+randint(0, 10)))
 		
 	def set_graph_object(self, graph_object:BaseGraph):
@@ -65,6 +74,7 @@ class MainApplication(ctk.CTkFrame):
 		self.master.title("WaveCycler")
 		self.master = master
 		self.config = config
+		print(self.config.MAIN_LIST_PATH)
 
 		self.grid()
 		self._create_frames()
@@ -94,9 +104,12 @@ class MainApplication(ctk.CTkFrame):
 		self.load_1_button.grid(row=1, column=0)
 
 		# create three instances of the ListBoxData class, using 'grid' as the layout manager
-		self.listbox1 = ListBoxData("List 1", ["Item 1", "Item 2", "Item 3"], self.listbox_frame, tk.Listbox.grid, row=0, column=0)
-		self.listbox2 = ListBoxData("List 2", ["Item A", "Item B", "Item C"], self.listbox_frame, tk.Listbox.grid, row=0, column=1)
-		self.listbox3 = ListBoxData("List 3", ["Item x", "Item y", "Item z"], self.listbox_frame, tk.Listbox.grid, row=1, column=0)
+		self.listbox1 = ListBoxData("List 1", self.config.MAIN_LIST_PATH, ["Item 1", "Item 2", "Item 3"], self.listbox_frame)
+		self.listbox1.grid(row=0, column=0)
+		self.listbox2 = ListBoxData("List 2", self.config.SUPER6_MAIN_PATH_DEBUG, ["Item A", "Item B", "Item C"], self.listbox_frame)
+		self.listbox2.grid(row=0, column=1)
+		self.listbox3 = ListBoxData("List 3", self.config.SUPER6_ALT_PATH_DEBUG, ["Item x", "Item y", "Item z"], self.listbox_frame)
+		self.listbox3.grid(row=0, column=2)
 
 		# Bind the generic callback function to all listboxes
 		self.listbox_frame.bind("<<ListboxSelect>>", listbox_callback)
